@@ -1,14 +1,9 @@
-
-from turtle import color
-from pytest import console_main
 import requests
-from fake_useragent import UserAgent
 import pandas as pd
-from bs4 import BeautifulSoup as BS
 import csv
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
-
+import random
 plt.rcParams['font.sans-serif'] = ['Microsoft JhengHei']
 plt.rcParams['axes.unicode_minus'] = False
 
@@ -100,7 +95,13 @@ def plot_data(day=1):
     plt.legend()
     plt.show()
 
-modify_highpeak_eachday()
+def simple_predict(day):
+    if 4<day<=7:
+        return random.randint(-150,150)
+    else:
+        return random.randint(200,450)
+    
+# modify_highpeak_eachday()
 # split_to_date_stage()
 # plot_data()
 # You can write code above the if-main block.
@@ -151,11 +152,8 @@ if __name__ == '__main__':
         writer.writerow(header)
         for date in date_list:
             tmp = []
-            # print('2021'+date['date'][-4:])
-            # print(predict_test('2021'+date['date'][-4:]))
-            # print(date)
             tmp.append(date['date'])
-            tmp.append(int(predict_test('2021'+date['date'][-4:]))+250)
+            tmp.append(int(predict_test('2021'+date['date'][-4:]))+simple_predict(date['day']))
             # print(tmp)
             writer.writerow(tmp)
             # write a row to the csv file
