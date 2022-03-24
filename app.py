@@ -9,10 +9,18 @@ import csv
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 
-plt.rcParams['font.sans-serif'] = ['Microsoft JhengHei'] 
+plt.rcParams['font.sans-serif'] = ['Microsoft JhengHei']
 plt.rcParams['axes.unicode_minus'] = False
+
+
 def get_electic_data():
     url = 'https://data.taipower.com.tw/opendata/apply/file/d006005/台灣電力公司_過去電力供需資訊.csv'
+    r = requests.get(url, allow_redirects=True)
+    open('./本年度每日尖峰備轉容量率.csv', 'wb').write(r.content)
+
+
+def get_electic_data_day():
+    url = '	https://data.taipower.com.tw/opendata/apply/file/d006002/本年度每日尖峰備轉容量率.csv'
     r = requests.get(url, allow_redirects=True)
     open('./本年度每日尖峰備轉容量率.csv', 'wb').write(r.content)
 
@@ -48,8 +56,8 @@ def split_to_date_stage():
     for i in range(len(data)):
         item = data.loc[i]
         stage_list[item['星期']].append(
-            [item['淨尖峰供電能力(MW)'], item['尖峰負載(MW)'], item['備轉容量(MW)'],item['日期'],item['日期'][4:-2]])
-    header = ['淨尖峰供電能力(MW)', '尖峰負載(MW)', '備轉容量(MW)','日期','月份']
+            [item['淨尖峰供電能力(MW)'], item['尖峰負載(MW)'], item['備轉容量(MW)'], item['日期'], item['日期'][4:-2]])
+    header = ['淨尖峰供電能力(MW)', '尖峰負載(MW)', '備轉容量(MW)', '日期', '月份']
     for i in date_key:
         with open('./Data/台灣電力公司_過去電力供需整理星期{}資訊.csv'.format(i), 'w', encoding='UTF8', newline='') as f:
             writer = csv.writer(f)
@@ -57,25 +65,42 @@ def split_to_date_stage():
             for data in stage_list[i]:
                 writer.writerow(data)
 
+
 def predict_test(date):
     data = pd.read_csv("./Data/台灣電力公司_過去電力供需整理資訊.csv",
                        encoding='utf-8', dtype=object)
     for i in range(len(data)):
         item = data.loc[i]
         if item['日期'] == date:
-            return   item['備轉容量(MW)']  
+            return item['備轉容量(MW)']
     return "3000"
 
+
+def modify_highpeak_eachday():
+    data = pd.read_csv("./Data/本年度每日尖峰備轉容量率.csv",
+                       encoding='utf-8', dtype=object)
+    with open('./Data/本年度每日尖峰備轉容量率整理.csv', 'w', encoding='UTF8', newline='') as f:
+        header=["日期","備轉容量(萬瓩)","備轉容量率(%)"]
+        writer = csv.writer(f)  
+        writer.writerow(header)
+        for i in range(len(data)):
+            item = data.loc[i]
+            item['備轉容量(萬瓩)'] = int(float(item['備轉容量(萬瓩)'])*10) 
+            writer.writerow([item['日期'],item['備轉容量(萬瓩)'],item['備轉容量率(%)']])
+
 def plot_data(day=1):
-    data = pd.read_csv("./Data/台灣電力公司_過去電力供需整理星期{}資訊.csv".format(day), encoding='utf-8', dtype=object)
+    data = pd.read_csv(
+        "./Data/台灣電力公司_過去電力供需整理星期{}資訊.csv".format(day), encoding='utf-8', dtype=object)
     ee = list(map(int, data['淨尖峰供電能力(MW)'].tolist()))
     dd = list(map(int, data['尖峰負載(MW)'].tolist()))
-    test =list(map(lambda x: x[4:-2],  data['日期']))
+    test = list(map(lambda x: x[4:-2],  data['日期']))
     print(test)
-    plt.plot([*range(len(ee))],ee , label = "淨尖峰供電能力")
-    plt.plot( [*range(len(dd))],dd, label = "尖峰負載",color='red')
+    plt.plot([*range(len(ee))], ee, label="淨尖峰供電能力")
+    plt.plot([*range(len(dd))], dd, label="尖峰負載", color='red')
     plt.legend()
     plt.show()
+
+modify_highpeak_eachday()
 # split_to_date_stage()
 # plot_data()
 # You can write code above the if-main block.
@@ -119,7 +144,7 @@ if __name__ == '__main__':
                  {"date": '20220412', "day": 2},
                  {"date": '20220413', "day": 3},
                  ]
-    
+
     with open(args.output, 'w', encoding='UTF8', newline='') as f:
         # create the csv writer
         writer = csv.writer(f)
