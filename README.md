@@ -15,37 +15,29 @@
 ![](https://i.imgur.com/xVkcBi9.png)
 1. 111年根本災難 備轉容量根本超參差的
 ### 統整
+
 #### 瞬時尖峰負載
-* 今年
-![](https://i.imgur.com/KGYJoQK.png)
-
-1. 發現  local lowest point 多為星期一
+* 今年周尖峰負載
+![](https://i.imgur.com/aQSwY73.png)
+1. 發現  local lowest point 多為周末，推測應該是周末工業休息。
 2. 發現 local highest point 大多為星期三、四
-3. 隨著越接近假日，有逐漸上升之趨勢
-
-5. * 去年至今年2月比例圖
+* 去年至今年2月比例圖
 ![](https://i.imgur.com/R0pULMW.png)
 
-
 #### 供電能力
-* 今年
-![](https://i.imgur.com/7ywFbCh.png)
-
-
+* 今年周供電圖
+![](https://i.imgur.com/w94vvAZ.png)
 * 去年至今年2月比例圖
 ![](https://i.imgur.com/OJfmvul.png)
 
 #### 備轉容量
-今年
-![](https://i.imgur.com/8t2qDz7.png)
-1. 發現今年有許多跳電及停電的狀況，所以備轉容量，就聽天命吧。
+今年周備轉容量
+![](https://i.imgur.com/HpsVSxb.png)
+1. 找不太到關鍵點，聽天命了。
 2. 1-2月的部分差距還算可接受。
 * 去年至今年2月比例圖
 ![](https://i.imgur.com/AS5DlGF.png)
-發現單看備轉容量是完全無法推測出東西的...
-而且今年的參差度相較於去年差很多
-
-
+今年的參差度相較於去年差很多
 
 
 ## 影響供電來源
