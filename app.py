@@ -39,8 +39,35 @@ def modify_data():
             if first > 7:
                 first = 1
             writer.writerow(tmp)
+# （系統運轉淨尖峰供電能力－系統瞬時尖峰負載(瞬間值)）÷系統瞬時尖峰負載(瞬間值)×100%
+# (x-y) =備轉容量 => (備轉容量 / y) *100= 備轉容量率
 
 
+def calculate_electric_serve():
+    data = pd.read_csv("./Data/本年度每日尖峰備轉容量率.csv",
+                       encoding='utf-8', dtype=object)
+    date = list(map(lambda x: x.replace('/', ''),  data['日期'].tolist()))
+    # 備轉容量to (MW)
+    md = list(map(lambda x: int(float(x)*10), data['備轉容量(萬瓩)'].tolist()))
+    ww = list(map(lambda x: float(x),  data['備轉容量率(%)'].tolist()))
+    ee = []  # 轉淨尖峰供電能力
+    dd = []  # 尖峰負載
+    for index in range(len(ww)):
+        d = md[index]*100 / ww[index]
+        dd.append(int(d))
+        ee.append(int(d+md[index]))
+
+    day=6 #20220101為星期六
+    with open('./Data/本年度每日尖峰備轉容量率整理.csv', 'w', encoding='UTF8', newline='') as f:
+        header=['日期','星期','淨尖峰供電能力(MW)','尖峰負載(MW)','備轉容量(MW)','備轉容量率(%)']   
+        writer = csv.writer(f)
+        writer.writerow(header)
+        for index in range(len(ww)):
+            writer.writerow([date[index],day,ee[index],dd[index],md[index],ww[index]])
+            day+=1
+            if day>7:
+                day=1
+             
 def split_to_date_stage():
     data = pd.read_csv("./Data/台灣電力公司_過去電力供需整理資訊.csv",
                        encoding='utf-8', dtype=object)
@@ -61,8 +88,8 @@ def split_to_date_stage():
                 writer.writerow(data)
 
 
-def predict_test(date):
-    data = pd.read_csv("./Data/台灣電力公司_過去電力供需整理資訊.csv",
+def predict_test(date, csv="./Data/台灣電力公司_過去電力供需整理資訊.csv"):
+    data = pd.read_csv(csv,
                        encoding='utf-8', dtype=object)
     for i in range(len(data)):
         item = data.loc[i]
@@ -71,17 +98,18 @@ def predict_test(date):
     return "3000"
 
 
-def modify_highpeak_eachday():
-    data = pd.read_csv("./Data/本年度每日尖峰備轉容量率.csv",
-                       encoding='utf-8', dtype=object)
-    with open('./Data/本年度每日尖峰備轉容量率整理.csv', 'w', encoding='UTF8', newline='') as f:
-        header=["日期","備轉容量(萬瓩)","備轉容量率(%)"]
-        writer = csv.writer(f)  
-        writer.writerow(header)
-        for i in range(len(data)):
-            item = data.loc[i]
-            item['備轉容量(萬瓩)'] = int(float(item['備轉容量(萬瓩)'])*10) 
-            writer.writerow([item['日期'],item['備轉容量(萬瓩)'],item['備轉容量率(%)']])
+# def modify_highpeak_eachday():
+#     data = pd.read_csv("./Data/本年度每日尖峰備轉容量率.csv",
+#                        encoding='utf-8', dtype=object)
+#     with open('./Data/本年度每日尖峰備轉容量率整理.csv', 'w', encoding='UTF8', newline='') as f:
+#         header = ["日期", "備轉容量(萬瓩)", "備轉容量率(%)"]
+#         writer = csv.writer(f)
+#         writer.writerow(header)
+#         for i in range(len(data)):
+#             item = data.loc[i]
+#             item['備轉容量(萬瓩)'] = int(float(item['備轉容量(萬瓩)'])*10)
+#             writer.writerow([item['日期'], item['備轉容量(萬瓩)'], item['備轉容量率(%)']])
+
 
 def plot_data(day=1):
     data = pd.read_csv(
@@ -95,12 +123,14 @@ def plot_data(day=1):
     plt.legend()
     plt.show()
 
+
 def simple_predict(day):
-    if 4<day<=7:
-        return random.randint(-150,150)
+    if 4 < day <= 7:
+        return random.randint(-150, 150)
     else:
-        return random.randint(200,450)
-    
+        return random.randint(200, 450)
+
+
 # modify_highpeak_eachday()
 # split_to_date_stage()
 # plot_data()
@@ -118,6 +148,7 @@ if __name__ == '__main__':
                         default='submission.csv',
                         help='output file name')
     args = parser.parse_args()
+    # calculate_electric_serve()
 
     # The following part is an example.
     # You can modify it at will.
@@ -153,7 +184,7 @@ if __name__ == '__main__':
         for date in date_list:
             tmp = []
             tmp.append(date['date'])
-            tmp.append(int(predict_test('2021'+date['date'][-4:]))+simple_predict(date['day']))
+            tmp.append(int(predict_test('2021'+date['date'][-4:],args.training))+simple_predict(date['day']))
             # print(tmp)
             writer.writerow(tmp)
             # write a row to the csv file
