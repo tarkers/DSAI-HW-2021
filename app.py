@@ -244,7 +244,7 @@ if __name__ == '__main__':
                  {"date": '20220412', "day": '2'},
                  {"date": '20220413', "day": '3'},
                  ]
-    data = pd.read_csv("./Data/本年度每日尖峰備轉容量率整理.csv",
+    data = pd.read_csv("./training_data.csv",
                        encoding='utf-8', dtype=object)
     # latest_week:讀取最新一周狀況
     # ee_part:將所有尖峰供電能力分成星期
